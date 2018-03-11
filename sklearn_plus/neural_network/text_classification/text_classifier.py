@@ -1,14 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import time
+import datetime
+import os
+
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.pipeline import Pipeline
 from sklearn_plus.utils.data_helpers import batch_iter
+from sklearn_plus.preprocessing import LabelOneHotEncoder
 
 from models.cnn_lstm import CNN_LSTM   #OPTION 0
 from models.lstm_cnn import LSTM_CNN   #OPTION 1
 from models.cnn import CNN             #OPTION 2 (Model by: Danny Britz)
 from models.lstm import LSTM           #OPTION 3
 
-#Source: https://github.com/pmsosa/CS291K
+import tensorflow as tf
+from tensorflow.contrib import learn
+
+import numpy as np
+
+# Source: https://github.com/pmsosa/CS291K
 class TextClassifier(BaseEstimator, ClassifierMixin):
 
     def __init__(self):
@@ -34,8 +46,8 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
         batch_size = 128
         num_epochs = 10 #200
         evaluate_every = 100 #100
-        checkpoint_every = 100000 #100
-        num_checkpoints = 0 #Checkpoints to store
+        checkpoint_every = 5 #100
+        num_checkpoints = 1 #Checkpoints to store
         
         # Misc Parameters
         allow_soft_placement = True
@@ -45,13 +57,22 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
         # ==================================================
 
         x_text = X
+
+#        self.onehotencoder = Pipeline([
+#                ('label', LabelEncoder()),
+#                ('onehot', OneHotEncoder()),
+#                ])
+##        y = self.onehotencoder.fit_transform(np.array(y).reshape((-1, 1))).toarray()
+        self.onehotencoder = LabelOneHotEncoder()
+        y = self.onehotencoder.fit_transform(y)
+        print y
         
         # Build vocabulary
         max_document_length = max([len(x.split(" ")) for x in x_text])
         if (not use_glove):
             print "Not using GloVe"
-            vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-            x = np.array(list(vocab_processor.fit_transform(x_text)))
+            self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+            x = np.array(list(self.vocab_processor.fit_transform(x_text)))
         else:
             print "Using GloVe"
             embedding_dim = 50
@@ -78,23 +99,22 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
             embedding_init = W.assign(embedding_placeholder)
         
             session_conf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-            sess = tf.Session(config=session_conf)
-            sess.run(embedding_init, feed_dict={embedding_placeholder: embedding})
-        
-            from tensorflow.contrib import learn
-            #init vocab processor
-            vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-            #fit the vocab from glove
-            pretrain = vocab_processor.fit(vocab)
-            #transform inputs
-            x = np.array(list(vocab_processor.transform(x_text)))
+            self.sess = tf.Session(config=session_conf)
+            self.sess.run(embedding_init, feed_dict={embedding_placeholder: embedding})
         
             #init vocab processor
-            vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+            self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
             #fit the vocab from glove
-            pretrain = vocab_processor.fit(vocab)
+            pretrain = self.vocab_processor.fit(vocab)
             #transform inputs
-            x = np.array(list(vocab_processor.transform(x_text)))
+            x = np.array(list(self.vocab_processor.transform(x_text)))
+        
+            #init vocab processor
+            self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+            #fit the vocab from glove
+            pretrain = self.vocab_processor.fit(vocab)
+            #transform inputs
+            x = np.array(list(self.vocab_processor.transform(x_text)))
         
         
         # Randomly shuffle data
@@ -108,7 +128,7 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
         dev_sample_index = -1 * int(dev_size * float(len(y)))
         x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
         y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-        print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
+        print("Vocabulary Size: {:d}".format(len(self.vocab_processor.vocabulary_)))
         print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
         
         #embed()
@@ -119,17 +139,19 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
         
         with tf.Graph().as_default():
             session_conf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-            sess = tf.Session(config=session_conf)
-            with sess.as_default():
+            self.sess = tf.Session(config=session_conf)
+            with self.sess.as_default():
                 #embed()
                 if (MODEL_TO_RUN == 0):
-                    model = CNN_LSTM(x_train.shape[1],y_train.shape[1],len(vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
+                    print x_train.shape
+                    print y_train.shape
+                    self.model = CNN_LSTM(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
                 elif (MODEL_TO_RUN == 1):
-                    model = LSTM_CNN(x_train.shape[1],y_train.shape[1],len(vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
+                    self.model = LSTM_CNN(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
                 elif (MODEL_TO_RUN == 2):
-                    model = CNN(x_train.shape[1],y_train.shape[1],len(vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
+                    self.model = CNN(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
                 elif (MODEL_TO_RUN == 3):
-                    model = LSTM(x_train.shape[1],y_train.shape[1],len(vocab_processor.vocabulary_),embedding_dim)
+                    self.model = LSTM(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim)
                 else:
                     print "PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n"
                     exit();
@@ -138,7 +160,7 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
                 # Define Training procedure
                 global_step = tf.Variable(0, name="global_step", trainable=False)
                 optimizer = tf.train.AdamOptimizer(1e-3)
-                grads_and_vars = optimizer.compute_gradients(model.loss)
+                grads_and_vars = optimizer.compute_gradients(self.model.loss)
                 train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
         
                 # Keep track of gradient values and sparsity (optional)
@@ -157,18 +179,18 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
                 print("Writing to {}\n".format(out_dir))
         
                 # Summaries for loss and accuracy
-                loss_summary = tf.summary.scalar("loss", model.loss)
-                acc_summary = tf.summary.scalar("accuracy", model.accuracy)
+                loss_summary = tf.summary.scalar("loss", self.model.loss)
+                acc_summary = tf.summary.scalar("accuracy", self.model.accuracy)
         
                 # Train Summaries
                 train_summary_op = tf.summary.merge([loss_summary, acc_summary, grad_summaries_merged])
                 train_summary_dir = os.path.join(out_dir, "summaries", "train")
-                train_summary_writer = tf.summary.FileWriter(train_summary_dir, sess.graph)
+                train_summary_writer = tf.summary.FileWriter(train_summary_dir, self.sess.graph)
         
                 # Dev summaries
                 dev_summary_op = tf.summary.merge([loss_summary, acc_summary])
                 dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
-                dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, sess.graph)
+                dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, self.sess.graph)
         
                 # Checkpoint directory. Tensorflow assumes this directory already exists so we need to create it
                 checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
@@ -178,20 +200,20 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
                 saver = tf.train.Saver(tf.global_variables(), max_to_keep=num_checkpoints)
         
                 # Write vocabulary
-                vocab_processor.save(os.path.join(out_dir, "vocab"))
+                self.vocab_processor.save(os.path.join(out_dir, "vocab"))
         
                 # Initialize all variables
-                sess.run(tf.global_variables_initializer())
+                self.sess.run(tf.global_variables_initializer())
         
                 #TRAINING STEP
                 def train_step(x_batch, y_batch,save=False):
                     feed_dict = {
-                      model.input_x: x_batch,
-                      model.input_y: y_batch,
-                      model.dropout_keep_prob: dropout_prob
+                      self.model.input_x: x_batch,
+                      self.model.input_y: y_batch,
+                      self.model.dropout_keep_prob: dropout_prob
                     }
-                    _, step, summaries, loss, accuracy = sess.run(
-                        [train_op, global_step, train_summary_op, model.loss, model.accuracy],
+                    _, step, summaries, loss, accuracy = self.sess.run(
+                        [train_op, global_step, train_summary_op, self.model.loss, self.model.accuracy],
                         feed_dict)
                     time_str = datetime.datetime.now().isoformat()
                     print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
@@ -201,12 +223,12 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
                 #EVALUATE MODEL
                 def dev_step(x_batch, y_batch, writer=None,save=False):
                     feed_dict = {
-                      model.input_x: x_batch,
-                      model.input_y: y_batch,
-                      model.dropout_keep_prob: 0.5
+                      self.model.input_x: x_batch,
+                      self.model.input_y: y_batch,
+                      self.model.dropout_keep_prob: 0.5
                     }
-                    step, summaries, loss, accuracy = sess.run(
-                        [global_step, dev_summary_op, model.loss, model.accuracy],
+                    step, summaries, loss, accuracy = self.sess.run(
+                        [global_step, dev_summary_op, self.model.loss, self.model.accuracy],
                         feed_dict)
                     time_str = datetime.datetime.now().isoformat()
                     print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
@@ -215,18 +237,29 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
                             writer.add_summary(summaries, step)
         
                 #CREATE THE BATCHES GENERATOR
-                batches = batchgen.gen_batch(list(zip(x_train, y_train)), batch_size, num_epochs)
+                batches = batch_iter(list(zip(x_train, y_train)), batch_size, num_epochs)
                 
                 #TRAIN FOR EACH BATCH
                 for batch in batches:
                     x_batch, y_batch = zip(*batch)
                     train_step(x_batch, y_batch)
-                    current_step = tf.train.global_step(sess, global_step)
+                    current_step = tf.train.global_step(self.sess, global_step)
                     if current_step % evaluate_every == 0:
                         print("\nEvaluation:")
                         dev_step(x_dev, y_dev, writer=dev_summary_writer)
                         print("")
                     if current_step % checkpoint_every == 0:
-                        path = saver.save(sess, checkpoint_prefix, global_step=current_step)
+                        path = saver.save(self.sess, checkpoint_prefix, global_step=current_step)
                         print("Saved model checkpoint to {}\n".format(path))
                 dev_step(x_dev, y_dev, writer=dev_summary_writer)
+
+
+    def predict(self, X):
+        feed_dict = {
+          self.model.input_x: np.array(list(self.vocab_processor.transform(X))),
+          self.model.dropout_keep_prob: 0.5
+        }
+        predictions = self.sess.run(
+            [self.model.predictions],
+            feed_dict)
+        return self.onehotencoder.inverse_transform(predictions)

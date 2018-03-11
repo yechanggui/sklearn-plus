@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from IPython import embed
 
 class CNN_LSTM(object):
     def __init__(self, sequence_length, num_classes, vocab_size, embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0,num_hidden=100):
@@ -60,14 +59,15 @@ class CNN_LSTM(object):
             #lstm_final_output = val[-1]
             #embed()
             self.scores = tf.nn.xw_plus_b(last, out_weight,out_bias, name="scores")
-            self.predictions = tf.nn.softmax(self.scores, name="predictions")
+            self.logits = tf.nn.softmax(self.scores, name="logits")
+            self.predictions = tf.argmax(self.logits, 1, name="predictions")
 
         with tf.name_scope("loss"):
             self.losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores,labels=self.input_y)
             self.loss = tf.reduce_mean(self.losses, name="loss")
 
         with tf.name_scope("accuracy"):
-            self.correct_pred = tf.equal(tf.argmax(self.predictions, 1),tf.argmax(self.input_y, 1))
+            self.correct_pred = tf.equal(self.predictions,tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, "float"),name="accuracy")
 
         print "(!) LOADED CNN-LSTM! :)"

@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from IPython import embed
 
 class LSTM_CNN(object):
     def __init__(self, sequence_length, num_classes, vocab_size, embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0,num_hidden=100):
@@ -62,7 +61,8 @@ class LSTM_CNN(object):
             l2_loss += tf.nn.l2_loss(W)
             l2_loss += tf.nn.l2_loss(b)
             self.scores = tf.nn.xw_plus_b(self.h_drop, W, b, name="scores")
-            self.predictions = tf.argmax(self.scores, 1, name="predictions")
+            self.logits = tf.nn.softmax(self.scores, name="logits")
+            self.predictions = tf.argmax(self.logits, 1, name="predictions")
 
         # CalculateMean cross-entropy loss
         with tf.name_scope("loss"):
