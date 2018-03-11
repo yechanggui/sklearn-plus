@@ -259,7 +259,17 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
           self.model.input_x: np.array(list(self.vocab_processor.transform(X))),
           self.model.dropout_keep_prob: 0.5
         }
-        predictions = self.sess.run(
-            [self.model.predictions],
+        logits = self.sess.run(
+            self.model.logits,
             feed_dict)
-        return self.onehotencoder.inverse_transform(predictions)
+        return self.onehotencoder.inverse_transform(logits)
+
+    def predict_proba(self, X):
+        feed_dict = {
+          self.model.input_x: np.array(list(self.vocab_processor.transform(X))),
+          self.model.dropout_keep_prob: 0.5
+        }
+        logits = self.sess.run(
+            self.model.logits,
+            feed_dict)
+        return logits.tolist()
