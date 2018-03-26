@@ -20,3 +20,4 @@ class TestSklearn_plus(unittest.TestCase):
 
     def test_000_something(self):
         """Test something."""
+        pass
