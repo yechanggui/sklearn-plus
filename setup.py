@@ -26,11 +26,11 @@ test_requirements = [
 setup(
     name='sklearn_plus',
     version='0.1.0',
-    description="Python Boilerplate contains all the boilerplate you need to create a Python package.",
+    description="A set of python modules for Natural Language Processing",
     long_description=readme + '\n\n' + history,
     author="Yuwen Yan",
     author_email='ybbaigo@gmail.com',
-    url='https://github.com/ybbaigo/sklearn_plus',
+    url='https://github.com/ybbaigo/sklearn-plus',
     packages=find_packages(include=['sklearn_plus']),
     include_package_data=True,
     install_requires=requirements,
