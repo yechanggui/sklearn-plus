@@ -16,7 +16,7 @@ Sklearn Plus
 
 
 
-Python Boilerplate contains all the boilerplate you need to create a Python package.
+A set of python modules for Natural Language Processing
 
 
 * Free software: MIT license
