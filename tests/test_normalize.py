@@ -6,7 +6,7 @@
 
 import unittest
 
-from sklearn_plus.preprocessing.text.zh import Normalizer
+from sklearn_plus.preprocessing.text.zh.normalize import Normalizer
 
 
 class TestJieba_tokenizer(unittest.TestCase):

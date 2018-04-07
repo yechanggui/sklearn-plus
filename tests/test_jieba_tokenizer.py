@@ -6,7 +6,7 @@
 
 import unittest
 
-from sklearn_plus.preprocessing.text.zh import JiebaTokenizer
+from sklearn_plus.preprocessing.text.zh.jieba_tokenizer import JiebaTokenizer
 
 
 class TestJieba_tokenizer(unittest.TestCase):
