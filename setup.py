@@ -22,7 +22,7 @@ setup_requirements = [
 
 test_requirements = [
     # TODO: Put package test requirements here
-    "jieba"
+    "jieba","scikit-learn","tensorflow"
 ]
 
 setup(
