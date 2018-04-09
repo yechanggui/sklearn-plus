@@ -1,10 +1,12 @@
 import tensorflow as tf
 
+from sklearn_plus.model import Model
 
 class Demo(object):
     """docstring for Demo"""
 
-    def __init__(self):
+    def __init__(self,x_length,num_classes):
+        self.model_config = locals()  # must add the top of __init__ function.
         # input and output
         self.x_data = tf.placeholder(shape=[1], dtype=tf.float32, name="input_x")
         self.y_target = tf.placeholder(shape=[1], dtype=tf.float32, name="input_y")
@@ -21,8 +23,6 @@ class Demo(object):
         self.predictions = tf.sign(self.logits, name="prediction")
 
         # loss
-        self.loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.predictions, labels=self.y_target, name="loss")
+        self.loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.logits, labels=self.y_target, name="loss")
 
-        print "loaded demo graph! :)"
-
-
+        print("loaded demo graph! :)")

@@ -22,4 +22,4 @@ class TestJieba_tokenizer(unittest.TestCase):
         normalizer = Normalizer()
         assert normalizer.transform(
             [u'详情查看：http://www.ruyi.ai/，或者关注微信公众号“艾如意宝宝”获取更多信息']
-        ) == [u'详情查看 http   www ruyi ai  或者关注微信公众号 艾如意宝宝 获取更多信息']
+        ) == [u'详情查看：http   www ruyi ai ，或者关注微信公众号“艾如意宝宝”获取更多信息']

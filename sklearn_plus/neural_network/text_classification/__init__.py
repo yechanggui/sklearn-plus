@@ -1,1 +1,4 @@
-from text_classifier import TextClassifier
+from .models import *
+
+def deserialize(class_name):
+    return globals()[class_name]
