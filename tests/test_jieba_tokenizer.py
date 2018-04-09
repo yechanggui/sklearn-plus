@@ -20,8 +20,8 @@ class TestJieba_tokenizer(unittest.TestCase):
 
     def test_basic(self):
         tokenizer = JiebaTokenizer()
-        assert tokenizer.transform(['今天上海的天气']) == [u'今天 上海 的 天气']
+        assert tokenizer.transform([u'今天上海的天气']) == [u'今天 上海 的 天气']
 
     def test_words(self):
-        tokenizer = JiebaTokenizer(words=['上海的天气'])
-        assert tokenizer.transform(['今天上海的天气']) == [u'今天 上海的天气']
+        tokenizer = JiebaTokenizer(words=[u'上海的天气'])
+        assert tokenizer.transform([u'今天上海的天气']) == [u'今天 上海的天气']

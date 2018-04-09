@@ -19,7 +19,7 @@ class Normalizer(BaseEstimator, TransformerMixin):
 
         for x in X:
             tmp = x.strip().lower()
-            if isinstance(tmp, str):
+            if not isinstance(tmp, str):
                 tmp = tmp.decode()
             tmp = re.sub('^http.*$', u' ', tmp)
             tmp = re.sub('[ 、，。？：（）【】〜！/@\-\",:<>~\'()\[\]⋯?$!._^]', u' ', tmp)

@@ -35,7 +35,7 @@ class JiebaTokenizer(BaseEstimator, TransformerMixin):
 
         if words is not None:
             for word in words:
-                if isinstance(word, str):
+                if not isinstance(word, str):
                     word = word.decode()
                 self.tokenizer.add_word(word)
 
