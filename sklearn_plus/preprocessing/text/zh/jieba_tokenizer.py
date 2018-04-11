@@ -35,8 +35,10 @@ class JiebaTokenizer(BaseEstimator, TransformerMixin):
 
         if words is not None:
             for word in words:
-                if isinstance(word, str):
-                    word = word.decode('utf-8')
+                try:
+                    tmp = tmp.decode('utf-8')
+                except UnicodeEncodeError:
+                    tmp = tmp
                 self.tokenizer.add_word(word)
 
     def fit(self, X):
