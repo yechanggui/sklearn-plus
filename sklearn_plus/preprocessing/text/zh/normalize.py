@@ -23,6 +23,8 @@ class Normalizer(BaseEstimator, TransformerMixin):
                 tmp = tmp.decode('utf-8')
             except UnicodeEncodeError:
                 tmp = tmp
+            except AttributeError:
+                tmp = tmp
             tmp = re.sub('^http.*$', u' ', tmp)
             tmp = re.sub('[ 、，。？：（）【】〜！/@\-\",:<>~\'()\[\]⋯?$!._^]', u' ', tmp)
             tmp = re.sub(r'^[a-zA-Z0-9.*+\-_]+$', u' ', tmp)
