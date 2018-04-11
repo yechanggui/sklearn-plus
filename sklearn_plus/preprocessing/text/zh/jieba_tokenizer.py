@@ -5,7 +5,7 @@
  JiebaTokenizer class which used for segmenting chinese sentence into words.
 
 """
-
+from __future__ import unicode_literals
 import jieba
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -35,12 +35,6 @@ class JiebaTokenizer(BaseEstimator, TransformerMixin):
 
         if words is not None:
             for word in words:
-                try:
-                    word = word.decode('utf-8')
-                except UnicodeEncodeError:
-                    word = word
-                except AttributeError:
-                    word = word
                 self.tokenizer.add_word(word)
 
     def fit(self, X):

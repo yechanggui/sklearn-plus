@@ -9,7 +9,7 @@ import numpy as np
 from sklearn_plus.neural_network.text_classification.demo import DemoClassifier
 
 
-class TestDemo_model(unittest.TestCase):
+class TestDemoModel(unittest.TestCase):
     """Tests for `sklearn_plus` package."""
 
     def setUp(self):

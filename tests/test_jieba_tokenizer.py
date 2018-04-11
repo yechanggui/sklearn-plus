@@ -9,7 +9,7 @@ import unittest
 from sklearn_plus.preprocessing.text.zh.jieba_tokenizer import JiebaTokenizer
 
 
-class TestJieba_tokenizer(unittest.TestCase):
+class TestJiebaTokenizer(unittest.TestCase):
     """Tests for `sklearn_plus` package."""
 
     def setUp(self):
