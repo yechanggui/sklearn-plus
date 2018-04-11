@@ -5,7 +5,6 @@
 import os
 import tensorflow as tf
 import json
-import neural_network as nn
 
 ###############################################################################
 class ModelMixin(object):
@@ -72,6 +71,8 @@ class ModelMixin(object):
         assert os.path.exists(model_config_dir), 'can\'t find the model_config.json'
         self.model_config_dir = model_config_dir
         self.model_config = json.load(open(self.model_config_dir))
+
+        import sklearn_plus.neural_network as nn # maybe need change
         model = nn.deserialize(self.model_config['class_name'])
 
         del self.model_config['class_name']

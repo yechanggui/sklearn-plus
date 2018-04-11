@@ -6,10 +6,8 @@
 
 import unittest
 
-from sklearn_plus import sklearn_plus
 
-
-class TestSklearn_plus(unittest.TestCase):
+class TestSklearnPlus(unittest.TestCase):
     """Tests for `sklearn_plus` package."""
 
     def setUp(self):

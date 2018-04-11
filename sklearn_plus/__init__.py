@@ -2,6 +2,8 @@
 from __future__ import absolute_import
 
 from .neural_network import *
+from .preprocessing import *
+from .utils import *
 
 
 __author__ = """Yuwen Yan, Xiaoan Liu"""
