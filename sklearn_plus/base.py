@@ -5,8 +5,7 @@
 import os
 import tensorflow as tf
 import json
-from .neural_network.text_classification import deserialize
-
+import neural_network as nn
 
 ###############################################################################
 class ModelMixin(object):
@@ -73,7 +72,7 @@ class ModelMixin(object):
         assert os.path.exists(model_config_dir), 'can\'t find the model_config.json'
         self.model_config_dir = model_config_dir
         self.model_config = json.load(open(self.model_config_dir))
-        model = deserialize(self.model_config['class_name'])
+        model = nn.deserialize(self.model_config['class_name'])
 
         del self.model_config['class_name']
         self.model = model(**self.model_config)

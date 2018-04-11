@@ -1,4 +1,5 @@
-from .models import *
+from __future__ import absolute_import
 
-def deserialize(class_name):
-    return globals()[class_name]
+from .demo import DemoClassifier
+from .text_classifier import TextClassifier
+from .text_classifier_cp import TextClassifierCP

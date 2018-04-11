@@ -22,10 +22,10 @@ import numpy as np
 
 
 # Source: https://github.com/pmsosa/CS291K
-class TextClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
+class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
 
     def __init__(self, checkpoint_dir=None, summary_dir=None):
-        super(TextClassifier, self).__init__()
+        super(TextClassifierCP, self).__init__()
         self.checkpoint_dir = checkpoint_dir
         self.summary_dir = summary_dir
 

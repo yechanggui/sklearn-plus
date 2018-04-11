@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
-from sklearn_plus.neural_network.text_classification.text_classifier_cp import TextClassifier
-from sklearn_plus.neural_network.text_classification.demo import DemoClassifier
+from sklearn_plus.neural_network.text_classification import DemoClassifier
 
 if __name__ =="__main__":
     # clf = TextClassifier(checkpoint_dir='/Users/liuxiaoan/Downloads/sklearn_plus_test_cp',
