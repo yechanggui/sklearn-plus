@@ -6,8 +6,8 @@ import numpy as np
 import tensorflow as tf
 from sklearn.base import BaseEstimator, ClassifierMixin
 
-from sklearn_plus.base import ModelMixin
-from models.demo_model import Demo
+from ...base import ModelMixin
+from .models.demo_model import Demo
 
 
 class DemoClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
