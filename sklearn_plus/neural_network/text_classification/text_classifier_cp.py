@@ -9,11 +9,11 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn_plus.utils.data_helpers import batch_iter
 from sklearn_plus.preprocessing.label_onehot_encoder import LabelOneHotEncoder
 
-from models.cnn_lstm import CNN_LSTM  # OPTION 0
-from models.lstm_cnn import LSTM_CNN  # OPTION 1
-from models.cnn import CNN  # OPTION 2 (Model by: Danny Britz)
-from models.lstm import LSTM  # OPTION 3
-from sklearn_plus.base import ModelMixin  #
+from .models.cnn_lstm import CNN_LSTM  # OPTION 0
+from .models.lstm_cnn import LSTM_CNN  # OPTION 1
+from .models.cnn import CNN  # OPTION 2 (Model by: Danny Britz)
+from .models.lstm import LSTM  # OPTION 3
+from ...base import ModelMixin  #
 
 import tensorflow as tf
 from tensorflow.contrib import learn

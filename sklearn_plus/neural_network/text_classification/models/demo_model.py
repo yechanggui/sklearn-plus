@@ -1,6 +1,5 @@
 import tensorflow as tf
 
-from sklearn_plus.model import Model
 
 class Demo(object):
     """docstring for Demo"""
