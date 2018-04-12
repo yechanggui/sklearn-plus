@@ -11,7 +11,7 @@ class LSTM(object):
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")      # Y - The Lables
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")       # Dropout
 
-        
+
         l2_loss = tf.constant(0.0) # Keeping track of l2 regularization loss
 
         #1. EMBEDDING LAYER ################################################################
@@ -28,7 +28,7 @@ class LSTM(object):
         #embed()
 
         val2 = tf.transpose(self.lstm_out, [1, 0, 2])
-        last = tf.gather(val2, int(val2.get_shape()[0]) - 1) 
+        last = tf.gather(val2, int(val2.get_shape()[0]) - 1)
 
         out_weight = tf.Variable(tf.random_normal([num_hidden, num_classes]))
         out_bias = tf.Variable(tf.random_normal([num_classes]))
@@ -47,4 +47,4 @@ class LSTM(object):
         with tf.name_scope("accuracy"):
             self.correct_pred = tf.equal(self.predictions,tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, "float"),name="accuracy")
-        print "LOADED LSTM!"
+        print("LOADED LSTM!")

@@ -70,6 +70,6 @@ class CNN_LSTM(object):
             self.correct_pred = tf.equal(self.predictions,tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, "float"),name="accuracy")
 
-        print "(!) LOADED CNN-LSTM! :)"
+        print("(!) LOADED CNN-LSTM! :)")
         #embed()
 

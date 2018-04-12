@@ -9,7 +9,7 @@ class LSTM_CNN(object):
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")      # Y - The Lables
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")       # Dropout
 
-        
+
         l2_loss = tf.constant(0.0) # Keeping track of l2 regularization loss
 
         #1. EMBEDDING LAYER ################################################################
@@ -46,7 +46,7 @@ class LSTM_CNN(object):
         num_filters_total = num_filters * len(filter_sizes)
         self.h_pool = tf.concat(pooled_outputs, 3)
         self.h_pool_flat = tf.reshape(self.h_pool, [-1, num_filters_total])
-        
+
         # #3. DROPOUT LAYER ###################################################################
         with tf.name_scope("dropout"):
             self.h_drop = tf.nn.dropout(self.h_pool_flat, self.dropout_keep_prob)
@@ -75,7 +75,7 @@ class LSTM_CNN(object):
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
 
 
-        print "(!!) LOADED LSTM-CNN! :)"
+        print("(!!) LOADED LSTM-CNN! :)")
         #embed()
 
 
