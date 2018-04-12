@@ -57,11 +57,9 @@ class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
         # Build vocabulary
         max_document_length = max([len(x.split(' ')) for x in x_text])
         if (not use_glove):
-            print "Not using GloVe"
             self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
             x = np.array(list(self.vocab_processor.fit_transform(x_text)))
         else:
-            print "Using GloVe"
             embedding_dim = 50
             filename = '../glove.6B.50d.txt'
 
@@ -122,8 +120,8 @@ class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
 
         # embed()
         if (MODEL_TO_RUN == 0):
-            print x_train.shape
-            print y_train.shape
+            print(x_train.shape)
+            print(y_train.shape)
             self.model = CNN_LSTM(x_train.shape[1], y_train.shape[1], len(self.vocab_processor.vocabulary_),
                                   embedding_dim, filter_sizes, num_filters, l2_reg_lambda)
         elif (MODEL_TO_RUN == 1):
@@ -136,7 +134,7 @@ class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
             self.model = LSTM(x_train.shape[1], y_train.shape[1], len(self.vocab_processor.vocabulary_),
                               embedding_dim)
         else:
-            print "PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n"
+            print("PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n")
             exit();
 
             # Define Training procedure
@@ -152,12 +150,12 @@ class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
         self.sess.run(init)
 
         summaries_dict = {
-            "loss":self.model.loss,
-            "accuracy":self.model.accuracy
+            "loss": self.model.loss,
+            "accuracy": self.model.accuracy
         }
 
         # TRAINING STEP
-        def train_step(x_batch, y_batch, save=False,summaries_dict=None):
+        def train_step(x_batch, y_batch, save=False, summaries_dict=None):
             feed_dict = {
                 self.model.input_x: x_batch,
                 self.model.input_y: y_batch,
@@ -184,9 +182,7 @@ class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
         # TRAIN FOR EACH BATCH
         for batch in batches:
             x_batch, y_batch = zip(*batch)
-            train_step(x_batch, y_batch,summaries_dict=summaries_dict)
-
-
+            train_step(x_batch, y_batch, summaries_dict=summaries_dict)
 
     def predict(self, X):
         feed_dict = {
@@ -197,7 +193,6 @@ class TextClassifierCP(BaseEstimator, ClassifierMixin, ModelMixin):
             self.model.prediction,
             feed_dict)
         return prediction_result
-
 
     def predict_proba(self, X):
         feed_dict = {

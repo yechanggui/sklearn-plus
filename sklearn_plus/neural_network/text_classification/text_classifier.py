@@ -65,16 +65,16 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
 ##        y = self.onehotencoder.fit_transform(np.array(y).reshape((-1, 1))).toarray()
         self.onehotencoder = LabelOneHotEncoder()
         y = self.onehotencoder.fit_transform(y)
-        print y
+        print(y)
 
         # Build vocabulary
         max_document_length = max([len(x.split(" ")) for x in x_text])
         if (not use_glove):
-            print "Not using GloVe"
+            print("Not using GloVe")
             self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
             x = np.array(list(self.vocab_processor.fit_transform(x_text)))
         else:
-            print "Using GloVe"
+            print("Using GloVe")
             embedding_dim = 50
             filename = '../glove.6B.50d.txt'
             def loadGloVe(filename):
@@ -143,8 +143,8 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
             with self.sess.as_default():
                 #embed()
                 if (MODEL_TO_RUN == 0):
-                    print x_train.shape
-                    print y_train.shape
+                    print(x_train.shape)
+                    print(y_train.shape)
                     self.model = CNN_LSTM(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
                 elif (MODEL_TO_RUN == 1):
                     self.model = LSTM_CNN(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
@@ -153,7 +153,7 @@ class TextClassifier(BaseEstimator, ClassifierMixin):
                 elif (MODEL_TO_RUN == 3):
                     self.model = LSTM(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim)
                 else:
-                    print "PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n"
+                    print("PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n")
                     exit();
 
 
