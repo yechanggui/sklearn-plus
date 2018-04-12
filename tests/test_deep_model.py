@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `jieba_tokenizer` package."""
+"""Tests for `demo classifier` package."""
 
 
 import unittest
 
-from sklearn_plus.neural_network.text_classification.demo import DemoClassifier
 
 
-class TestJiebaTokenizer(unittest.TestCase):
+
+class TestDemoClassifier(unittest.TestCase):
     """Tests for `sklearn_plus` package."""
 
     def setUp(self):
@@ -18,5 +18,6 @@ class TestJiebaTokenizer(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
 
-    def test_basic(self):
+    def test_demo(self):
+        from sklearn_plus.neural_network.text_classification.demo import DemoClassifier
         pass
