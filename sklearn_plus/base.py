@@ -6,7 +6,6 @@ import os
 import tensorflow as tf
 import json
 
-from .neural_network import deserialize
 
 ###############################################################################
 class ModelMixin(object):
@@ -74,6 +73,7 @@ class ModelMixin(object):
         self.model_config_dir = model_config_dir
         self.model_config = json.load(open(self.model_config_dir))
 
+        from .neural_network import deserialize
         model = deserialize(self.model_config['class_name'])
 
         del self.model_config['class_name']
