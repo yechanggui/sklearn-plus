@@ -6,7 +6,7 @@
 
 import unittest
 
-from sklearn_plus.preprocessing.text.zh.jieba_tokenizer import JiebaTokenizer
+from sklearn_plus.neural_network.text_classification.demo import DemoClassifier
 
 
 class TestJiebaTokenizer(unittest.TestCase):
@@ -19,9 +19,4 @@ class TestJiebaTokenizer(unittest.TestCase):
         """Tear down test fixtures, if any."""
 
     def test_basic(self):
-        tokenizer = JiebaTokenizer()
-        assert tokenizer.transform([u'今天上海的天气']) == [u'今天 上海 的 天气']
-
-    def test_words(self):
-        tokenizer = JiebaTokenizer(words=[u'上海的天气'])
-        assert tokenizer.transform([u'今天上海的天气']) == [u'今天 上海的天气']
+        pass
