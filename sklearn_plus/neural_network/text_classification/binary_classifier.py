@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Binary Classifier"""
-
-# Author: Xiaoan Liu <f13221698@gmail.com>
 
 import numpy as np
 import tensorflow as tf
