@@ -98,7 +98,7 @@ class ModelMixin(object):
 
         if summaries_dict is not None:
             for tag, value in summaries_dict.items():
-                if len(value.shape) <= 1:
+                if len(value.get_shape()) <= 1:
                     tf.summary.scalar(tag, tf.squeeze(value))
                 else:
                     tf.summary.histogram(tag, value)
