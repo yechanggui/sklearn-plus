@@ -10,7 +10,7 @@ import tensorflow as tf
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 from ...base import ModelMixin
-from .models.x_plus_b import XPlusB
+from .models import XPlusB
 
 
 class BiClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
@@ -86,9 +86,6 @@ class BiClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
                           feed_dict=feed_dict)
 
             if i % self.every_checkpoint == 0:
-                b, prediction = self.sess.run([self.model.b, self.model.predictions],
-                              feed_dict=feed_dict)
-                print(b)
                 # if summary is needed
                 if self.summary_dir:
                     self.summaries(self.summary_dir, feed_dict, summaries_dict)

@@ -9,7 +9,7 @@ import unittest
 
 
 
-class TestDemoClassifier(unittest.TestCase):
+class TestBiClassifier(unittest.TestCase):
     """Tests for `sklearn_plus` package."""
 
     def setUp(self):

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from sklearn_plus.neural_network.text_classification import BiClassifier
+from sklearn_plus.neural_network.text_classification.binary_classifier import BiClassifier
 
 if __name__ == "__main__":
     x_vals = np.concatenate((np.random.normal(-1, 1, 50), np.random.normal(3, 1, 50)))
