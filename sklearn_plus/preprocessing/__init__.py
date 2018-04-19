@@ -1,1 +1,1 @@
-from label_onehot_encoder import LabelOneHotEncoder
+from .label_onehot_encoder import LabelOneHotEncoder

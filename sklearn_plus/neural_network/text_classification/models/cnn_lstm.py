@@ -3,13 +3,13 @@ import numpy as np
 
 class CNN_LSTM(object):
     def __init__(self, sequence_length, num_classes, vocab_size, embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0,num_hidden=100):
-
+        self.model_config = locals()  # must add the top of __init__ function.
         # PLACEHOLDERS
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")    # X - The Data
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")      # Y - The Lables
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")       # Dropout
 
-        
+
         l2_loss = tf.constant(0.0) # Keeping track of l2 regularization loss
 
         #1. EMBEDDING LAYER ################################################################
@@ -37,7 +37,7 @@ class CNN_LSTM(object):
         num_filters_total = num_filters * len(filter_sizes)
         self.h_pool = tf.concat(pooled_outputs, 3)
         self.h_pool_flat = tf.reshape(self.h_pool, [-1, num_filters_total])
-        
+
         #3. DROPOUT LAYER ###################################################################
         with tf.name_scope("dropout"):
              self.h_drop = tf.nn.dropout(self.h_pool_flat, self.dropout_keep_prob)
@@ -46,11 +46,11 @@ class CNN_LSTM(object):
         cell = tf.contrib.rnn.LSTMCell(num_hidden,state_is_tuple=True)
         self.h_drop_exp = tf.expand_dims(self.h_drop,-1)
         val,state = tf.nn.dynamic_rnn(cell,self.h_drop_exp,dtype=tf.float32)
-        
+
         #embed()
 
         val2 = tf.transpose(val, [1, 0, 2])
-        last = tf.gather(val2, int(val2.get_shape()[0]) - 1) 
+        last = tf.gather(val2, int(val2.get_shape()[0]) - 1)
 
         out_weight = tf.Variable(tf.random_normal([num_hidden, num_classes]))
         out_bias = tf.Variable(tf.random_normal([num_classes]))
@@ -70,6 +70,6 @@ class CNN_LSTM(object):
             self.correct_pred = tf.equal(self.predictions,tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, "float"),name="accuracy")
 
-        print "(!) LOADED CNN-LSTM! :)"
+        print("(!) LOADED CNN-LSTM! :)")
         #embed()
 
