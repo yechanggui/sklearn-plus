@@ -30,11 +30,23 @@ Features
 
 Contributing pull requests
 --------
-* Follow the [coding-guidelines](https://numpydoc.readthedocs.io/en/latest/format.html#overview).
-* To make sure that your PR does not add PEP8 violations you can check it by [flake8](https://pypi.org/project/flake8/).
-* To make sure that your code is suitable for python2 and python3 you can check it by pycharm ([HOW TO](https://superuser.com/questions/920962/pycharm-turn-on-python-3-code-checking-in-a-python-2-project)).
-* To make sure that you have written test code for your contribution in the test directory.
 
+Here's a quick guide to submitting your improvements:
+
+1. **Write the code.** There are three base modules in sklearn plus: preprocess, utils and nerual_network. Write your code in the three modules and reference to the samples in them. We use PEP8 syntax conventions.
+2. **Write the docstrings.** Make sure any code you touch still has up-to-date docstrings and documentation. Please follow the [numpydoc style](https://numpydoc.readthedocs.io/en/latest/format.html#overview).
+
+3. **Write tests.** Your code should have full unit test coverage. If you want to see your PR merged promptly, this is crucial.
+
+4. **Make sure all tests are passing.** Make sure your code tests can pass on Python 2.7 and Python 3.6 with Tensorflow 1.1.0.
+
+5. **Make sure that your PR does not add PEP8 violations.** Make sure that your PR does not add PEP8 violations you can check it by [flake8](http://flake8.pycqa.org/en/latest/index.html#quickstart):
+  * install flake8: ```pip install flake8```
+  * check: ```flake8 path/to/code/```
+
+6. **Commit, use appropriate, descriptive commit messages.**
+
+7. **Submit your PR.** If you have complete (and passing) unit tests as well as proper docstrings/documentation, your PR is likely to be merged promptly.
 
 Credits
 -------
