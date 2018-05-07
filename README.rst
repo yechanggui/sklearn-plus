@@ -33,7 +33,7 @@ It was developed with a focus on expanding sklearn and making using deep learnin
 Features
 --------
 
-**End-To-End**. Sklearn plus is based on Tensorflow and implements many classical models. Also it offers easy and consistent API for specific NLP task.
+**End-To-End**. Sklearn plus is based on Tensorflow and implements many classical models. Also it offers easy and consistent API with sklearn style for specific NLP task.
 
 **Easy extensibility**. Sklearn plus inherits sklearn base classes and follows sklearn API design principles. It is easy to assemble new models, preprocessing functions and utils in it.
 
