@@ -26,18 +26,20 @@ Sklearn Plus
 Sklearn plus
 --------
 
-Sklearn plus is an end-to-end neural network API, written in Python. Currently we focus on Natural Language Processing(NLP) task. It is based on Tensoflow_ and scikit-learn_. It assembles many preprocessing function, utils and deep learning models about NLP task.
+Sklearn plus is an end-to-end neural network API, written in Python. Currently we focus on Natural Language Processing(NLP) tasks. It is based on Tensoflow_ and scikit-learn_. It assembles many preprocessing function, utils and deep learning models about NLP tasks.
 
-It was developed with a focus on expanding sklearn and making using deep learning model to handle NLP task easier.
+It was developed with a focus on expanding sklearn and making using deep learning model to handle NLP tasks easier.
 
 Features
 --------
 
 **End-To-End**. Sklearn plus is based on Tensorflow and implements many classical models. Also it offers easy and consistent API for specific NLP task.
-**Easy extensibility**. Sklearn plus inherits sklearn base class and follows sklearn API design principles. It is easy to assemble new models, preprocessing functions and utils in it.
+
+**Easy extensibility**. Sklearn plus inherits sklearn base classes and follows sklearn API design principles. It is easy to assemble new models, preprocessing functions and utils in it.
 
 .. _Tensoflow: https://www.tensorflow.org/
 .. _scikit-learn: http://scikit-learn.org/stable/
+
 
 Contributing pull requests
 --------
@@ -61,6 +63,7 @@ Here's a quick guide to submitting your improvements:
 
 .. _numpydoc_style: https://numpydoc.readthedocs.io/en/latest/format.html#overview
 .. _flake8: http://flake8.pycqa.org/en/latest/index.html#quickstart)
+
 
 Credits
 -------
