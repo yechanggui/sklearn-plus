@@ -21,13 +21,13 @@ import numpy as np
 # Source: https://github.com/pmsosa/CS291K
 class TextClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
 
-    def __init__(self, vocab_processor, checkpoint_dir=None, summary_dir=None, MODEL_TO_RUN=0, embedding_dim=32,
+    def __init__(self, vocab_size, checkpoint_dir=None, summary_dir=None, MODEL_TO_RUN=0, embedding_dim=32,
                  filter_sizes=[3, 4, 5], num_filters=32, dropout_prob=0.5, l2_reg_lambda=0.0, batch_size=128,
                  num_epochs=10):
         super(TextClassifier, self).__init__()
         self.checkpoint_dir = checkpoint_dir
         self.summary_dir = summary_dir
-        self.vocab_processor = vocab_processor
+        self.vocab_size = vocab_size
 
         self.MODEL_TO_RUN = MODEL_TO_RUN
         self.embedding_dim = embedding_dim
@@ -40,17 +40,17 @@ class TextClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
 
     def fit(self, X, y=None):
         if (self.MODEL_TO_RUN == 0):
-            self.model = CNN_LSTM(X.shape[1], y.shape[1], len(self.vocab_processor.vocabulary_),
+            self.model = CNN_LSTM(X.shape[1], y.shape[1], self.vocab_size,
                                   self.embedding_dim, self.filter_sizes, self.num_filters, self.l2_reg_lambda)
         elif (self.MODEL_TO_RUN == 1):
-            self.model = LSTM_CNN(X.shape[1], y.shape[1], len(self.vocab_processor.vocabulary_),
+            self.model = LSTM_CNN(X.shape[1], y.shape[1], self.vocab_size,
                                   self.embedding_dim, self.filter_sizes, self.num_filters, self.l2_reg_lambda)
         elif (self.MODEL_TO_RUN == 2):
-            self.model = CNN(X.shape[1], y.shape[1], len(self.vocab_processor.vocabulary_),
+            self.model = CNN(X.shape[1], y.shape[1], self.vocab_size,
                              self.embedding_dim, self.filter_sizes, self.num_filters, self.l2_reg_lambda)
         elif (self.MODEL_TO_RUN == 3):
-            self.model = LSTM(X.shape[1], y.shape[1], len(self.vocab_processor.vocabulary_),
-                              self.mbedding_dim)
+            self.model = LSTM(X.shape[1], y.shape[1], self.vocab_size,
+                              self.embedding_dim)
         else:
             print("PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n")
             exit();

@@ -26,7 +26,7 @@ if __name__ == '__main__':
     print('label is ready...')
 
     # train model
-    clf = TextClassifier(vocab_processor, checkpoint_dir='./classifier_model',
+    clf = TextClassifier(len(vocab_processor.vocabulary_), checkpoint_dir='./classifier_model',
                          summary_dir='./classifier_model')
     clf.fit(train_data, train_label)
     print('done.')
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     # load model
     del clf
-    clf = TextClassifier(vocab_processor, checkpoint_dir='./classifier_model',
+    clf = TextClassifier(len(vocab_processor.vocabulary_), checkpoint_dir='./classifier_model',
                          summary_dir='./classifier_model')
     clf.load('./classifier_model')
 

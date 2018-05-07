@@ -41,6 +41,34 @@ Features
 .. _scikit-learn: http://scikit-learn.org/stable/
 
 
+Quick Start
+--------
+
+
+
+Installation
+--------
+
+There are two ways to install Sklearn plus:
+
+1. **Install sklearn plus from PyPI(recommended)**:
+
+```sudo pip install sklearn-plus```
+
+If you are using a virtualenv, you may want to avoid using sudo:
+
+```pip install sklearn-plus```
+
+2. **Install sklearn plus from the GitHub source:**
+
+```
+
+git clone https://github.com/ybbaigo/sklearn-plus.git
+cd sklearn-plus
+sudo python setup.py install
+
+```
+
 Contributing pull requests
 --------
 

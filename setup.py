@@ -13,7 +13,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     # TODO: Put package requirements here
-
+    "jieba", "scikit-learn", "tensorflow==1.1.0", "numpy", "scipy", "nltk", "pandas"
 ]
 
 setup_requirements = [
@@ -22,7 +22,7 @@ setup_requirements = [
 
 test_requirements = [
     # TODO: Put package test requirements here
-    "jieba","scikit-learn","tensorflow==1.1.0","numpy","scipy","nltk","pandas"
+    "jieba", "scikit-learn", "tensorflow==1.1.0", "numpy", "scipy", "nltk", "pandas"
 ]
 
 setup(
@@ -30,8 +30,8 @@ setup(
     version='0.1.0',
     description="A set of python modules for Natural Language Processing",
     long_description=readme + '\n\n' + history,
-    author="Yuwen Yan",
-    author_email='ybbaigo@gmail.com',
+    author="Yuwen Yan, Xiaoan Liu",
+    author_email='ybbaigo@gmail.com, liuxiaoan8008@126.com',
     url='https://github.com/ybbaigo/sklearn-plus',
     packages=find_packages(include=['sklearn_plus']),
     include_package_data=True,
