@@ -26,10 +26,10 @@ Sklearn Plus
 Sklearn plus
 --------
 
-Sklearn plus is a end-to-end neural network API, written in Python. Currently we focus on Natural Language Processing(NLP) task. It is based on _Tensoflow_.
+Sklearn plus is a end-to-end neural network API, written in Python. Currently we focus on Natural Language Processing(NLP) task. It is based on Tensoflow_.
 
 
-.. _Tensoflow_: https://www.tensorflow.org/
+.. _Tensoflow: https://www.tensorflow.org/
 
 Contributing pull requests
 --------
@@ -37,13 +37,13 @@ Contributing pull requests
 Here's a quick guide to submitting your improvements:
 
 1. **Write the code.** There are three base modules in sklearn plus: preprocess, utils and nerual_network. Write your code in the three modules and reference to the samples in them. We use PEP8 syntax conventions.
-2. **Write the docstrings.** Make sure any code you touch still has up-to-date docstrings and documentation. Please follow the _numpydoc_style_.
+2. **Write the docstrings.** Make sure any code you touch still has up-to-date docstrings and documentation. Please follow the numpydoc_style_.
 
 3. **Write tests.** Your code should have full unit test coverage. If you want to see your PR merged promptly, this is crucial.
 
 4. **Make sure all tests are passing.** Make sure your code tests can pass on Python 2.7 and Python 3.6 with Tensorflow 1.1.0.
 
-5. **Make sure that your PR does not add PEP8 violations.** Make sure that your PR does not add PEP8 violations you can check it by _flake8_:
+5. **Make sure that your PR does not add PEP8 violations.** Make sure that your PR does not add PEP8 violations you can check it by flake8_:
   * install flake8: ```pip install flake8```
   * check: ```flake8 path/to/code/```
 
@@ -51,8 +51,8 @@ Here's a quick guide to submitting your improvements:
 
 7. **Submit your PR.** If you have complete (and passing) unit tests as well as proper docstrings/documentation, your PR is likely to be merged promptly.
 
-.. _numpydoc_style_: https://numpydoc.readthedocs.io/en/latest/format.html#overview
-.. _flake8_: http://flake8.pycqa.org/en/latest/index.html#quickstart)
+.. _numpydoc_style: https://numpydoc.readthedocs.io/en/latest/format.html#overview
+.. _flake8: http://flake8.pycqa.org/en/latest/index.html#quickstart)
 
 Credits
 -------
