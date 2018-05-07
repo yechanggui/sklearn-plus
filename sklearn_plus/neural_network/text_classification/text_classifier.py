@@ -6,268 +6,115 @@ import datetime
 import os
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.pipeline import Pipeline
 from sklearn_plus.utils.data_helpers import batch_iter
-from sklearn_plus.preprocessing import LabelOneHotEncoder
 
-from .models.cnn_lstm import CNN_LSTM   #OPTION 0
-from .models.lstm_cnn import LSTM_CNN   #OPTION 1
-from .models.cnn import CNN             #OPTION 2 (Model by: Danny Britz)
-from .models.lstm import LSTM           #OPTION 3
+from .models.cnn_lstm import CNN_LSTM  # OPTION 0
+from .models.lstm_cnn import LSTM_CNN  # OPTION 1
+from .models.cnn import CNN  # OPTION 2 (Model by: Danny Britz)
+from .models.lstm import LSTM  # OPTION 3
+from ...base import ModelMixin  #
 
 import tensorflow as tf
-from tensorflow.contrib import learn
-
 import numpy as np
 
-# Source: https://github.com/pmsosa/CS291K
-class TextClassifier(BaseEstimator, ClassifierMixin):
 
-    def __init__(self):
-        pass
+# Source: https://github.com/pmsosa/CS291K
+class TextClassifier(BaseEstimator, ClassifierMixin, ModelMixin):
+
+    def __init__(self, vocab_size, checkpoint_dir=None, summary_dir=None, MODEL_TO_RUN=0, embedding_dim=32,
+                 filter_sizes=[3, 4, 5], num_filters=32, dropout_prob=0.5, l2_reg_lambda=0.0, batch_size=128,
+                 num_epochs=10):
+        super(TextClassifier, self).__init__()
+        self.checkpoint_dir = checkpoint_dir
+        self.summary_dir = summary_dir
+        self.vocab_size = vocab_size
+
+        self.MODEL_TO_RUN = MODEL_TO_RUN
+        self.embedding_dim = embedding_dim
+        self.filter_sizes = filter_sizes
+        self.num_filters = num_filters
+        self.dropout_prob = dropout_prob
+        self.l2_reg_lambda = l2_reg_lambda
+        self.batch_size = batch_size
+        self.num_epochs = num_epochs
 
     def fit(self, X, y=None):
-
-        MODEL_TO_RUN = 0
-
-        # Data loading params
-        dev_size = .10
-
-        # Model Hyperparameters
-        embedding_dim  = 32     #128
-        max_seq_legth = 70
-        filter_sizes = [3,4,5]  #3
-        num_filters = 32
-        dropout_prob = 0.5 #0.5
-        l2_reg_lambda = 0.0
-        use_glove = False #Do we use glove
-
-        # Training parameters
-        batch_size = 128
-        num_epochs = 10 #200
-        evaluate_every = 100 #100
-        checkpoint_every = 5 #100
-        num_checkpoints = 1 #Checkpoints to store
-
-        # Misc Parameters
-        allow_soft_placement = True
-        log_device_placement = False
-
-        # Data Preparation
-        # ==================================================
-
-        x_text = X
-
-#        self.onehotencoder = Pipeline([
-#                ('label', LabelEncoder()),
-#                ('onehot', OneHotEncoder()),
-#                ])
-##        y = self.onehotencoder.fit_transform(np.array(y).reshape((-1, 1))).toarray()
-        self.onehotencoder = LabelOneHotEncoder()
-        y = self.onehotencoder.fit_transform(y)
-        print(y)
-
-        # Build vocabulary
-        max_document_length = max([len(x.split(" ")) for x in x_text])
-        if (not use_glove):
-            print("Not using GloVe")
-            self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-            x = np.array(list(self.vocab_processor.fit_transform(x_text)))
+        if (self.MODEL_TO_RUN == 0):
+            self.model = CNN_LSTM(X.shape[1], y.shape[1], self.vocab_size,
+                                  self.embedding_dim, self.filter_sizes, self.num_filters, self.l2_reg_lambda)
+        elif (self.MODEL_TO_RUN == 1):
+            self.model = LSTM_CNN(X.shape[1], y.shape[1], self.vocab_size,
+                                  self.embedding_dim, self.filter_sizes, self.num_filters, self.l2_reg_lambda)
+        elif (self.MODEL_TO_RUN == 2):
+            self.model = CNN(X.shape[1], y.shape[1], self.vocab_size,
+                             self.embedding_dim, self.filter_sizes, self.num_filters, self.l2_reg_lambda)
+        elif (self.MODEL_TO_RUN == 3):
+            self.model = LSTM(X.shape[1], y.shape[1], self.vocab_size,
+                              self.embedding_dim)
         else:
-            print("Using GloVe")
-            embedding_dim = 50
-            filename = '../glove.6B.50d.txt'
-            def loadGloVe(filename):
-                vocab = []
-                embd = []
-                file = open(filename,'r')
-                for line in file.readlines():
-                    row = line.strip().split(' ')
-                    vocab.append(row[0])
-                    embd.append(row[1:])
-                print('Loaded GloVe!')
-                file.close()
-                return vocab,embd
-            vocab,embd = loadGloVe(filename)
-            vocab_size = len(vocab)
-            embedding_dim = len(embd[0])
-            embedding = np.asarray(embd)
+            print("PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n")
+            exit();
 
-            W = tf.Variable(tf.constant(0.0, shape=[vocab_size, embedding_dim]),
-                            trainable=False, name="W")
-            embedding_placeholder = tf.placeholder(tf.float32, [vocab_size, embedding_dim])
-            embedding_init = W.assign(embedding_placeholder)
+        # Define Training procedure
+        optimizer = tf.train.AdamOptimizer(1e-3)
+        grads_and_vars = optimizer.compute_gradients(self.model.loss)
+        train_op = optimizer.apply_gradients(grads_and_vars, global_step=self.global_step)
 
-            session_conf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-            self.sess = tf.Session(config=session_conf)
-            self.sess.run(embedding_init, feed_dict={embedding_placeholder: embedding})
+        # init variables
+        init = tf.global_variables_initializer()
+        self.sess.run(init)
 
-            #init vocab processor
-            self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-            #fit the vocab from glove
-            pretrain = self.vocab_processor.fit(vocab)
-            #transform inputs
-            x = np.array(list(self.vocab_processor.transform(x_text)))
+        summaries_dict = {
+            "loss": self.model.loss,
+            "accuracy": self.model.accuracy
+        }
 
-            #init vocab processor
-            self.vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-            #fit the vocab from glove
-            pretrain = self.vocab_processor.fit(vocab)
-            #transform inputs
-            x = np.array(list(self.vocab_processor.transform(x_text)))
+        # TRAINING STEP
+        def train_step(x_batch, y_batch, summaries_dict=None):
+            feed_dict = {
+                self.model.input_x: x_batch,
+                self.model.input_y: y_batch,
+                self.model.dropout_keep_prob: self.dropout_prob
+            }
 
+            _, step, loss, accuracy = self.sess.run(
+                [train_op, self.global_step, self.model.loss, self.model.accuracy],
+                feed_dict)
 
-        # Randomly shuffle data
-        np.random.seed(42)
-        shuffle_indices = np.random.permutation(np.arange(len(y)))
-        x_shuffled = x[shuffle_indices]
-        y_shuffled = y[shuffle_indices]
+            time_str = datetime.datetime.now().isoformat()
+            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
 
-        # Split train/test set
-        # TODO: This is very crude, should use cross-validation
-        dev_sample_index = -1 * int(dev_size * float(len(y)))
-        x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-        y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-        print("Vocabulary Size: {:d}".format(len(self.vocab_processor.vocabulary_)))
-        print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+            if step % 50 == 0:
+                # if summary is needed
+                if self.summary_dir:
+                    self.summaries(self.summary_dir, feed_dict, summaries_dict)
 
-        #embed()
+                # if checkpoint is needed
+                if self.checkpoint_dir:
+                    self.save(self.checkpoint_dir)
 
+        # CREATE THE BATCHES GENERATOR
+        batches = batch_iter(list(zip(X,y)), self.batch_size, self.num_epochs)
 
-        # Training
-        # ==================================================
-
-        with tf.Graph().as_default():
-            session_conf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-            self.sess = tf.Session(config=session_conf)
-            with self.sess.as_default():
-                #embed()
-                if (MODEL_TO_RUN == 0):
-                    print(x_train.shape)
-                    print(y_train.shape)
-                    self.model = CNN_LSTM(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
-                elif (MODEL_TO_RUN == 1):
-                    self.model = LSTM_CNN(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
-                elif (MODEL_TO_RUN == 2):
-                    self.model = CNN(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim,filter_sizes,num_filters,l2_reg_lambda)
-                elif (MODEL_TO_RUN == 3):
-                    self.model = LSTM(x_train.shape[1],y_train.shape[1],len(self.vocab_processor.vocabulary_),embedding_dim)
-                else:
-                    print("PLEASE CHOOSE A VALID MODEL!\n0 = CNN_LSTM\n1 = LSTM_CNN\n2 = CNN\n3 = LSTM\n")
-                    exit();
-
-
-                # Define Training procedure
-                global_step = tf.Variable(0, name="global_step", trainable=False)
-                optimizer = tf.train.AdamOptimizer(1e-3)
-                grads_and_vars = optimizer.compute_gradients(self.model.loss)
-                train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
-
-                # Keep track of gradient values and sparsity (optional)
-                grad_summaries = []
-                for g, v in grads_and_vars:
-                    if g is not None:
-                        grad_hist_summary = tf.summary.histogram("{}/grad/hist".format(v.name), g)
-                        sparsity_summary = tf.summary.scalar("{}/grad/sparsity".format(v.name), tf.nn.zero_fraction(g))
-                        grad_summaries.append(grad_hist_summary)
-                        grad_summaries.append(sparsity_summary)
-                grad_summaries_merged = tf.summary.merge(grad_summaries)
-
-                # Output directory for models and summaries
-                timestamp = str(int(time.time()))
-                out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
-                print("Writing to {}\n".format(out_dir))
-
-                # Summaries for loss and accuracy
-                loss_summary = tf.summary.scalar("loss", self.model.loss)
-                acc_summary = tf.summary.scalar("accuracy", self.model.accuracy)
-
-                # Train Summaries
-                train_summary_op = tf.summary.merge([loss_summary, acc_summary, grad_summaries_merged])
-                train_summary_dir = os.path.join(out_dir, "summaries", "train")
-                train_summary_writer = tf.summary.FileWriter(train_summary_dir, self.sess.graph)
-
-                # Dev summaries
-                dev_summary_op = tf.summary.merge([loss_summary, acc_summary])
-                dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
-                dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, self.sess.graph)
-
-                # Checkpoint directory. Tensorflow assumes this directory already exists so we need to create it
-                checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
-                checkpoint_prefix = os.path.join(checkpoint_dir, "model")
-                if not os.path.exists(checkpoint_dir):
-                    os.makedirs(checkpoint_dir)
-                saver = tf.train.Saver(tf.global_variables(), max_to_keep=num_checkpoints)
-
-                # Write vocabulary
-                self.vocab_processor.save(os.path.join(out_dir, "vocab"))
-
-                # Initialize all variables
-                self.sess.run(tf.global_variables_initializer())
-
-                #TRAINING STEP
-                def train_step(x_batch, y_batch,save=False):
-                    feed_dict = {
-                      self.model.input_x: x_batch,
-                      self.model.input_y: y_batch,
-                      self.model.dropout_keep_prob: dropout_prob
-                    }
-                    _, step, summaries, loss, accuracy = self.sess.run(
-                        [train_op, global_step, train_summary_op, self.model.loss, self.model.accuracy],
-                        feed_dict)
-                    time_str = datetime.datetime.now().isoformat()
-                    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-                    if save:
-                        train_summary_writer.add_summary(summaries, step)
-
-                #EVALUATE MODEL
-                def dev_step(x_batch, y_batch, writer=None,save=False):
-                    feed_dict = {
-                      self.model.input_x: x_batch,
-                      self.model.input_y: y_batch,
-                      self.model.dropout_keep_prob: 0.5
-                    }
-                    step, summaries, loss, accuracy = self.sess.run(
-                        [global_step, dev_summary_op, self.model.loss, self.model.accuracy],
-                        feed_dict)
-                    time_str = datetime.datetime.now().isoformat()
-                    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-                    if save:
-                        if writer:
-                            writer.add_summary(summaries, step)
-
-                #CREATE THE BATCHES GENERATOR
-                batches = batch_iter(list(zip(x_train, y_train)), batch_size, num_epochs)
-
-                #TRAIN FOR EACH BATCH
-                for batch in batches:
-                    x_batch, y_batch = zip(*batch)
-                    train_step(x_batch, y_batch)
-                    current_step = tf.train.global_step(self.sess, global_step)
-                    if current_step % evaluate_every == 0:
-                        print("\nEvaluation:")
-                        dev_step(x_dev, y_dev, writer=dev_summary_writer)
-                        print("")
-                    if current_step % checkpoint_every == 0:
-                        path = saver.save(self.sess, checkpoint_prefix, global_step=current_step)
-                        print("Saved model checkpoint to {}\n".format(path))
-                dev_step(x_dev, y_dev, writer=dev_summary_writer)
-
+        # TRAIN FOR EACH BATCH
+        for batch in batches:
+            x_batch, y_batch = zip(*batch)
+            train_step(x_batch, y_batch, summaries_dict=summaries_dict)
 
     def predict(self, X):
         feed_dict = {
-          self.model.input_x: np.array(list(self.vocab_processor.transform(X))),
-          self.model.dropout_keep_prob: 0.5
+            self.model.input_x: X,
+            self.model.dropout_keep_prob: 0.5
         }
-        logits = self.sess.run(
-            self.model.logits,
+        prediction_result = self.sess.run(
+            self.model.predictions,
             feed_dict)
-        return self.onehotencoder.inverse_transform(logits)
+        return prediction_result
 
     def predict_proba(self, X):
         feed_dict = {
-          self.model.input_x: np.array(list(self.vocab_processor.transform(X))),
-          self.model.dropout_keep_prob: 0.5
+            self.model.input_x: X,
+            self.model.dropout_keep_prob: 0.5
         }
         logits = self.sess.run(
             self.model.logits,
