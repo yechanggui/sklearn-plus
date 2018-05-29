@@ -2,18 +2,8 @@
 Sklearn Plus
 ============
 
-
-.. image:: https://img.shields.io/pypi/v/sklearn_plus.svg
-    :target: https://pypi.python.org/pypi/sklearn_plus
-
 .. image:: https://api.travis-ci.org/ybbaigo/sklearn-plus.svg
     :target: https://travis-ci.org/ybbaigo/sklearn_plus
-
-.. image:: https://readthedocs.org/projects/sklearn-plus/badge/?version=latest
-    :target: https://sklearn-plus.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
 
 
     A set of python modules for Natural Language Processing
@@ -24,14 +14,14 @@ Sklearn Plus
 
 
 Sklearn plus
---------
+----------------
 
 Sklearn plus is an end-to-end neural network API, written in Python. Currently we focus on Natural Language Processing(NLP) tasks. It is based on Tensoflow_ and scikit-learn_. It assembles many preprocessing function, utils and deep learning models about NLP tasks.
 
 It was developed with a focus on expanding sklearn and making using deep learning model to handle NLP tasks easier.
 
 Features
---------
+----------------
 
 **End-To-End**. Sklearn plus is based on Tensorflow and implements many classical models. Also it offers easy and consistent API with sklearn style for specific NLP task.
 
@@ -42,12 +32,12 @@ Features
 
 
 Quick Start
---------
+----------------
 
 * TODO
 
 Installation
---------
+----------------
 
 There are two ways to install Sklearn plus:
 
@@ -73,7 +63,7 @@ If you are using a virtualenv, you may want to avoid using sudo:
 
 
 Contributing pull requests
---------
+--------------------------------
 
 Here's a quick guide to submitting your improvements:
 
@@ -85,6 +75,7 @@ Here's a quick guide to submitting your improvements:
 4. **Make sure all tests are passing.** Make sure your code tests can pass on Python 2.7 and Python 3.6 with Tensorflow 1.1.0.
 
 5. **Make sure that your PR does not add PEP8 violations.** Make sure that your PR does not add PEP8 violations you can check it by flake8_:
+
   * install flake8: ```pip install flake8```
   * check: ```flake8 path/to/code/```
 

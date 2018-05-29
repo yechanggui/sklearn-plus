@@ -27,9 +27,9 @@ test_requirements = [
 
 setup(
     name='sklearn_plus',
-    version='0.1.0',
+    version='0.0.1',
     description="A set of python modules for Natural Language Processing",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author="Yuwen Yan",
     author_email='ybbaigo@gmail.com',
     url='https://github.com/ybbaigo/sklearn-plus',
