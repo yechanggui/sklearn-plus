@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
-import datetime
 import os
 import dill
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn_plus.utils.data_helpers import batch_iter
 
 import numpy as np
 
@@ -18,16 +15,17 @@ from sklearn_plus.utils import const
 
 from sklearn import preprocessing
 
+
 class Estimator(BaseEstimator, ClassifierMixin):
 
     def __init__(self, model_dir, model_fn, params):
 
-        self.model_dir=model_dir
-        self.model_fn=model_fn
-        self.params=params
+        self.model_dir = model_dir
+        self.model_fn = model_fn
+        self.params = params
 
         if getattr(self.params, 'filter_sizes', None) is None:
-            self.params.add_hparam('filter_sizes', [3,4,5])
+            self.params.add_hparam('filter_sizes', [3, 4, 5])
 
         if getattr(self.params, 'embed_dim', None) is None:
             self.params.add_hparam('embed_dim', 100)
@@ -57,21 +55,27 @@ class Estimator(BaseEstimator, ClassifierMixin):
         if os.path.isfile(self.model_dir + '/' + const.filename_vocab):
             with open(self.model_dir + '/' + const.filename_vocab) as f:
                 self.vocab_processor = dill.loads(f.read())
-            self.params.add_hparam('vocab_size', len(self.vocab_processor.vocabulary_))
+            self.params.add_hparam(
+                'vocab_size',
+                len(self.vocab_processor.vocabulary_))
         else:
-            self.vocab_processor = learn.preprocessing.VocabularyProcessor(self.params.max_document_length)
+            self.vocab_processor =\
+                learn.preprocessing.VocabularyProcessor(
+                    self.params.max_document_length)
 
         if os.path.isfile(self.model_dir + '/' + const.filename_label):
             with open(self.model_dir + '/' + const.filename_label) as f:
                 self.label_processor = dill.loads(f.read())
-            self.params.add_hparam('class_num', len(self.label_processor.classes_))
+            self.params.add_hparam(
+                'class_num',
+                len(self.label_processor.classes_))
         else:
             self.label_processor = preprocessing.LabelEncoder()
 
         self.classifier = tf.estimator.Estimator(
-                model_dir=self.model_dir,
-                model_fn=self.model_fn,
-                params=self.params)
+            model_dir=self.model_dir,
+            model_fn=self.model_fn,
+            params=self.params)
 
     def preprocess_x(self, X):
         return np.array(list(self.vocab_processor.transform(X)))
@@ -83,33 +87,37 @@ class Estimator(BaseEstimator, ClassifierMixin):
         return self.label_processor.inverse_transform(y)
 
     @classmethod
-    def construct_input_fn(cls, word_ids, y=None, batch_size=128, num_epochs=1, shuffle=None):
+    def construct_input_fn(cls,
+                           word_ids,
+                           y=None, batch_size=128, num_epochs=1, shuffle=None):
         return tf.estimator.inputs.numpy_input_fn(
-                x={const.word_ids: word_ids},
-                y=y,
-                batch_size=batch_size,
-                num_epochs=num_epochs,
-                shuffle=shuffle)
+            x={const.word_ids: word_ids},
+            y=y,
+            batch_size=batch_size,
+            num_epochs=num_epochs,
+            shuffle=shuffle)
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None):
 
         self.vocab_processor.fit(X_train)
-        self.params.add_hparam('vocab_size', len(self.vocab_processor.vocabulary_))
+        self.params.add_hparam(
+            'vocab_size',
+            len(self.vocab_processor.vocabulary_))
 
         self.label_processor.fit(y_train)
         self.params.add_hparam('class_num', len(self.label_processor.classes_))
 
         self.classifier = tf.estimator.Estimator(
-                model_dir=self.model_dir,
-                model_fn=self.model_fn,
-                params=self.params)
+            model_dir=self.model_dir,
+            model_fn=self.model_fn,
+            params=self.params)
 
         train_input_fn = self.construct_input_fn(
-                word_ids=self.preprocess_x(X_train),
-                y=self.preprocess_y(y_train),
-                batch_size=self.classifier.params.batch_size,
-                num_epochs=self.classifier.params.num_epochs,
-                shuffle=True)
+            word_ids=self.preprocess_x(X_train),
+            y=self.preprocess_y(y_train),
+            batch_size=self.classifier.params.batch_size,
+            num_epochs=self.classifier.params.num_epochs,
+            shuffle=True)
         self.classifier.train(train_input_fn)
         if X_valid is not None and y_valid is not None:
             eval_input_fn = self.construct_input_fn(
@@ -128,7 +136,8 @@ class Estimator(BaseEstimator, ClassifierMixin):
             word_ids=self.preprocess_x(X),
             shuffle=False)
 
-        return [self.postprocess_y(p['class']) for p in self.classifier.predict(predict_input_fn)]
+        return [self.postprocess_y(p['class'])
+                for p in self.classifier.predict(predict_input_fn)]
 
     def predict_top_n(self, X, n=1):
         predict_input_fn = self.construct_input_fn(
@@ -149,6 +158,5 @@ class Estimator(BaseEstimator, ClassifierMixin):
                 item[u'confidence'] = probs[i]
                 categories.append(item)
 
-            response.append({u'categories' : categories})
+            response.append({u'categories': categories})
         return response
-
