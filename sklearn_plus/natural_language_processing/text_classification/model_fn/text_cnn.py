@@ -5,14 +5,14 @@ from sklearn_plus.utils import const
 
 def model_fn(features, labels, mode, params):
 
-    filter_sizes=[1,2,3,4,5,6,7]
-    embed_dim=100
-    num_filters=256
+    filter_sizes=params.filter_sizes
+    embed_dim=params.embed_dim
+    num_filters=params.num_filters
     num_filters_total=num_filters * len(filter_sizes)
-    dropout_keep_prob=0.5
-    l2_lambda=0.0001
-    decay_steps=6000
-    decay_rate=0.65
+    dropout_keep_prob=params.dropout_keep_prob
+    l2_lambda=params.l2_lambda
+    decay_steps=params.decay_steps
+    decay_rate=params.decay_rate
 
     global_step = tf.Variable(0, trainable=False, name="Global_Step")
 
@@ -78,7 +78,7 @@ def model_fn(features, labels, mode, params):
     loss = loss+l2_losses
 
     if mode == tf.estimator.ModeKeys.TRAIN:
-        learning_rate = tf.train.exponential_decay(0.01, global_step, decay_steps, decay_rate, staircase=True)
+        learning_rate = tf.train.exponential_decay(params.learning_rate, global_step, decay_steps, decay_rate, staircase=True)
 
         optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         train_op = optimizer.minimize(loss, global_step=tf.train.get_global_step())

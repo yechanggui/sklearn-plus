@@ -4,6 +4,7 @@
 import time
 import datetime
 import os
+import dill
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn_plus.utils.data_helpers import batch_iter
@@ -25,12 +26,59 @@ class Estimator(BaseEstimator, ClassifierMixin):
         self.model_fn=model_fn
         self.params=params
 
-        self.vocab_processor = learn.preprocessing.VocabularyProcessor(self.params.max_document_length)
-        self.label_processor = preprocessing.LabelEncoder()
+        if getattr(self.params, 'filter_sizes', None) is None:
+            self.params.add_hparam('filter_sizes', [3,4,5])
+
+        if getattr(self.params, 'embed_dim', None) is None:
+            self.params.add_hparam('embed_dim', 100)
+
+        if getattr(self.params, 'num_filters', None) is None:
+            self.params.add_hparam('num_filters', 256)
+
+        if getattr(self.params, 'dropout_keep_prob', None) is None:
+            self.params.add_hparam('dropout_keep_prob', 0.5)
+
+        if getattr(self.params, 'l2_lambda', None) is None:
+            self.params.add_hparam('l2_lambda', 0.0001)
+
+        if getattr(self.params, 'decay_steps', None) is None:
+            self.params.add_hparam('decay_steps', 6000)
+
+        if getattr(self.params, 'decay_rate', None) is None:
+            self.params.add_hparam('decay_rate', 0.65)
+
+        if getattr(self.params, 'learning_rate', None) is None:
+            self.params.add_hparam('learning_rate', 0.1)
+
+        assert getattr(self.params, 'batch_size', None) is not None
+        assert getattr(self.params, 'num_epochs', None) is not None
+        assert getattr(self.params, 'max_document_length', None) is not None
+
+        if os.path.isfile(self.model_dir + '/' + const.filename_vocab):
+            with open(self.model_dir + '/' + const.filename_vocab) as f:
+                self.vocab_processor = dill.loads(f.read())
+            self.params.add_hparam('vocab_size', len(self.vocab_processor.vocabulary_))
+        else:
+            self.vocab_processor = learn.preprocessing.VocabularyProcessor(self.params.max_document_length)
+
+        if os.path.isfile(self.model_dir + '/' + const.filename_label):
+            with open(self.model_dir + '/' + const.filename_label) as f:
+                self.label_processor = dill.loads(f.read())
+            self.params.add_hparam('class_num', len(self.label_processor.classes_))
+        else:
+            self.label_processor = preprocessing.LabelEncoder()
+
+        self.classifier = tf.estimator.Estimator(
+                model_dir=self.model_dir,
+                model_fn=self.model_fn,
+                params=self.params)
+
     def preprocess_x(self, X):
         return np.array(list(self.vocab_processor.transform(X)))
+
     def preprocess_y(self, y):
         return self.label_processor.transform(y)
+
     def postprocess_y(self, y):
         return self.label_processor.inverse_transform(y)
 
@@ -70,16 +118,17 @@ class Estimator(BaseEstimator, ClassifierMixin):
                 shuffle=True)
             self.classifier.evaluate(eval_input_fn)
 
+        with open(self.model_dir + '/' + const.filename_vocab, 'wb') as f:
+            f.write(dill.dumps(self.vocab_processor))
+        with open(self.model_dir + '/' + const.filename_label, 'wb') as f:
+            f.write(dill.dumps(self.label_processor))
+
     def predict(self, X):
         predict_input_fn = self.construct_input_fn(
             word_ids=self.preprocess_x(X),
             shuffle=False)
 
         return [self.postprocess_y(p['class']) for p in self.classifier.predict(predict_input_fn)]
-#        return [self.postprocess_y(p['class'].argsort()[0-top_n:][::-1]) for p in self.classifier.predict(predict_input_fn)]
-#        top_n_idx = y_predict.argsort()[0-top_n:][::-1]
-#        classes = self.postprocessor.inverse_transform(topn_idx)
-#        return [p['prob'][1] for p in self.classifier.predict(predict_input_fn)]
 
     def predict_top_n(self, X, n=1):
         predict_input_fn = self.construct_input_fn(
