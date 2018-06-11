@@ -12,7 +12,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    "jieba","scikit-learn","tensorflow==1.2.0","numpy","scipy","nltk","pandas", 'dill', 'numpy>=1.11.0'
+    "jieba","scikit-learn","tensorflow>=1.2.0","numpy","scipy","nltk","pandas", 'dill', 'numpy>=1.11.0', 'ipython==5'
 ]
 
 setup_requirements = [
@@ -20,7 +20,7 @@ setup_requirements = [
 ]
 
 test_requirements = [
-    "jieba","scikit-learn","tensorflow==1.2.0","numpy","scipy","nltk","pandas"
+    "jieba","scikit-learn","tensorflow>=1.2.0","numpy","scipy","nltk","pandas"
 ]
 
 setup(
