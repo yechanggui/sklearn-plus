@@ -25,7 +25,7 @@ test_requirements = [
 
 setup(
     name='sklearn_plus',
-    version='0.0.4',
+    version='0.0.5',
     description="A set of python modules for Natural Language Processing",
     long_description=readme,
     author="Yuwen Yan",
